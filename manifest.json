@@ -1,0 +1,27 @@
+{
+  "manifest_version": 2,
+
+  "name": "RAWG Library Cleaner",
+  "description": "Helps you quickly sort all the owned games your RAWG library.",
+  "version": "1.0",
+  "icons": {
+    "16": "icon.jpg",
+    "48": "icon.jpg",
+    "128": "icon.jpg"
+  },
+  "browser_action": {
+    "default_icon": {
+      "16": "icon.jpg",
+      "24": "icon.jpg",
+      "32": "icon.jpg"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": ["*://*.rawg.io/*", "*://rawg.io/*"],
+      "js": ["vue.js", "components.js", "content.js"],
+      "css": ["styles.css"]
+    }
+  ],
+  "permissions": ["activeTab", "storage", "*://*.rawg.io/"]
+}
