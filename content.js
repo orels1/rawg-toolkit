@@ -35,6 +35,12 @@ const createElement = (tag, text = null, attrs = {}, onClick) => {
     const root = document.querySelector('.category-container.available');
     const mountPoint = createElement('div', '', { id: 'rawg-cleanup' });
     root.prepend(mountPoint);
+    document.head.append(
+      createElement('link', '', {
+        href: 'https://fonts.googleapis.com/css?family=Press+Start+2P',
+        rel: 'stylesheet'
+      })
+    );
     mount();
   };
 
