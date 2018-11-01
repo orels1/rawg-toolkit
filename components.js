@@ -36,10 +36,20 @@
               @keydown.j="setStatus('C')"
               @keydown.k="setStatus('A')"
               @keydown.l="setStatus('Y')"
+              @keydown.z="comboActive = !comboActive"
               @keydown.left="prev"
               @keydown.right="next"
+              @keydown.up="comboUp"
             />
-            <h3 style="color: white;" v-show="loading">{{loading ? 'Loading' : 'Loaded'}} {{loaded}} / {{total}}</h3>
+            <div class="cleanup_loading" v-show="loading">
+              <div class="cleanup_row cleanup_loading__counter">
+                <div>Loading your games...</div>
+                <div>{{this.total - this.loaded}} left</div>
+              </div>
+              <div class="cleanup_loading__container">
+                <div class="cleanup_loading__progress" :style="loadingProgressStyle" />
+              </div>
+            </div>
             <div class="cleanup_item" v-if="games.length > 0 && !loading">
               <div class="cleanup_item__info">
                 <div />
@@ -51,6 +61,9 @@
                 <div class="cleanup_item__arrows">
                   <div class="cleanup_item__arrow left" @click="prev">&lt;</div>
                   <div class="cleanup_item__arrow right" @click="next">&gt;</div>
+                </div>
+                <div class="cleanup_loading__container cleanup_combo__bar" v-show="combo > 0">
+                  <div :class="['cleanup_loading__progress', comboBarClass]" />
                 </div>
               </div>
               <img v-if="currIndex < total -1" class="cleanup_prefetch" :src="games[currIndex + 1].background_image" />
@@ -65,6 +78,12 @@
                   >
                     {{action}}
                   </div>
+                  <div v-show="combo > 0" class="cleanup_item__combo">
+                    <i>x</i>
+                    <b :class="['cleanup_item__combo_hax', comboClass]">{{combo}}</b>
+                    <b class="cleanup_hidden">{{combo}}</b>
+                    <b :class="['cleanup_item__combo_shadow', comboClass]">{{combo}}</b>
+                  </div>
                 </div>
               </div>
               <div class="cleanup_item__help">
@@ -75,6 +94,10 @@
                 Use arrow keys to navigate.
                 <br />
                 You can also use <b>1, 2, 3, 4</b> or <b>H, J, K, L</b> to assign statues (same order as the above).
+                <hr class="cleanup_separator" />
+                Use <b>Z</b> to toggle combo mode.
+                <br />
+                <b>Combo Mode is {{comboActive ? 'on! 👊' : 'off'}}</b>
               </div>
             </div>
           </div>
@@ -90,7 +113,14 @@
             C: 'beaten',
             Y: 'yet',
             A: 'dropped'
-          }
+          },
+          combo: 0,
+          comboClass: '',
+          comboBarTimeout: null,
+          comboBarClass: 'decay',
+          comboTimeout: null,
+          animation: null,
+          comboActive: true
         }),
         computed: {
           username() {
@@ -101,9 +131,41 @@
           },
           loading() {
             return this.loaded !== this.total || this.total === 0;
+          },
+          loadingProgressStyle() {
+            return {
+              width: `${(this.loaded / this.total) * 100}%`
+            };
           }
         },
         methods: {
+          clearTimeouts() {
+            if (this.comboTimeout) {
+              clearTimeout(this.comboTimeout);
+            }
+            if (this.animation) {
+              clearTimeout(this.animation);
+            }
+            if (this.comboBarTimeout) {
+              clearTimeout(this.comboBarTimeout);
+            }
+          },
+          comboUp() {
+            if (!this.comboActive) return;
+            this.clearTimeouts();
+            this.combo += 1;
+            this.comboClass = 'cleanup_boom';
+            this.comboBarClass = '';
+            this.comboBarTimeout = setTimeout(() => {
+              this.comboBarClass = 'decay';
+            }, 50);
+            this.animation = setTimeout(() => {
+              this.comboClass = '';
+            }, 300);
+            this.comboTimeout = setTimeout(() => {
+              this.combo = 0;
+            }, 7000);
+          },
           async loadTotal() {
             const resp = await fetch(
               `https://api.rawg.io/api/users/${
@@ -112,6 +174,7 @@
             );
             const json = await resp.json();
             this.total = json.count;
+            // this.total = 40;
           },
           async loadPage(url) {
             const resp = await fetch(url);
@@ -148,6 +211,7 @@
             if (resp.ok) {
               this.games[this.currIndex].status = this.statusMap[status];
               this.next();
+              this.comboUp();
             }
           },
           loadToken() {
