@@ -3,7 +3,7 @@
 
   "name": "RAWG Library Cleaner",
   "description": "Helps you quickly sort all the owned games your RAWG library.",
-  "version": "1.0",
+  "version": "1.1",
   "icons": {
     "16": "icon.jpg",
     "48": "icon.jpg",
