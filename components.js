@@ -24,10 +24,18 @@
               class="cleanup_catcher"
               ref="catcher"
               autofocus
-              @keydown.y="setStatus('Y')"
+              @keydown.p="setStatus('P')"
               @keydown.c="setStatus('C')"
               @keydown.a="setStatus('A')"
-              @keydown.p="setStatus('P')"
+              @keydown.y="setStatus('Y')"
+              @keydown.49="setStatus('P')"
+              @keydown.50="setStatus('C')"
+              @keydown.51="setStatus('A')"
+              @keydown.52="setStatus('Y')"
+              @keydown.h="setStatus('P')"
+              @keydown.j="setStatus('C')"
+              @keydown.k="setStatus('A')"
+              @keydown.l="setStatus('Y')"
               @keydown.left="prev"
               @keydown.right="next"
             />
@@ -64,7 +72,9 @@
                 <br />
                 Use <b>P, C, A, Y</b> to assign the statuses <b>Playing, Completed, Abandoned, Yet To Play</b> respectively.
                 <br />
-                Use arrow keys to navigate
+                Use arrow keys to navigate.
+                <br />
+                You can also use <b>1, 2, 3, 4</b> or <b>H, J, K, L</b> to assign statues (same order as the above).
               </div>
             </div>
           </div>
