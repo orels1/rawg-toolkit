@@ -1,6 +1,6 @@
-<h1 align="center">RAWG Library Cleaner</h1>
+<h1 align="center">RAWG Toolkit</h1>
 <p align="center">
-  <strong>🚀 A Chrome extension to help you clean your RAWG library 🚀</strong><br />
+  <strong>🚀 A Chrome extension to use RAWG efficiently 🚀</strong><br />
 </p>
 
 <p align="center">
