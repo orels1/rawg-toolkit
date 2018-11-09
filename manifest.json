@@ -1,9 +1,8 @@
 {
   "manifest_version": 2,
-
-  "name": "RAWG Library Cleaner",
-  "description": "Helps you quickly sort all the owned games your RAWG library.",
-  "version": "1.1",
+  "name": "RAWG Toolkit",
+  "description": "Helps you use RAWG efficiently.",
+  "version": "1.2",
   "icons": {
     "16": "icon.jpg",
     "48": "icon.jpg",
@@ -16,6 +15,13 @@
       "32": "icon.jpg"
     }
   },
+  "omnibox": {
+    "keyword": "rg"
+  },
+  "background": {
+    "scripts": ["bg.js", "omnibox.js"],
+    "persistent": true
+  },
   "content_scripts": [
     {
       "matches": ["*://*.rawg.io/*", "*://rawg.io/*"],
@@ -23,5 +29,5 @@
       "css": ["styles.css"]
     }
   ],
-  "permissions": ["activeTab", "storage", "*://*.rawg.io/"]
+  "permissions": ["activeTab", "notifications", "storage", "*://*.rawg.io/"]
 }
