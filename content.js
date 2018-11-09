@@ -14,6 +14,8 @@ const createElement = (tag, text = null, attrs = {}, onClick) => {
 
 (() => {
   let app = null;
+  let insertInterval = null;
+
   const mount = () => {
     app = new Vue({
       el: '#rawg-cleanup',
@@ -33,6 +35,11 @@ const createElement = (tag, text = null, attrs = {}, onClick) => {
 
   const insert = () => {
     const root = document.querySelector('.category-container.available');
+    if (!root) {
+      clearInterval(insertInterval);
+      return;
+    }
+
     const mountPoint = createElement('div', '', { id: 'rawg-cleanup' });
     root.prepend(mountPoint);
     document.head.append(
@@ -49,5 +56,17 @@ const createElement = (tag, text = null, attrs = {}, onClick) => {
       insert();
     }
   };
-  setInterval(checkInsertion, 1000);
+
+  if (window.location.pathname.includes('@')) {
+    insertInterval = setInterval(checkInsertion, 1000);
+  }
+
+  // grab and sync cookie on first launch
+  const grabCookie = () => {
+    let token = document.cookie.substr(document.cookie.indexOf('token'));
+    token = token.substr(6, token.indexOf(';') - 6);
+    chrome.storage.sync.set({ token: `Token ${token}` });
+  };
+
+  grabCookie();
 })();
