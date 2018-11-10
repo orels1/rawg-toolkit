@@ -1,7 +1,7 @@
 const coolLog = (...arguments) => {
   console.log(
     '%c RAWG' + '%c TOOLKIT 🚀 ',
-    'background: #000; color: #fff',
+    'background: #000; color: #fff; font-weight: bold;',
     'background: #000; color: hsl(0, 0%, 50%)',
     ...arguments
   );
