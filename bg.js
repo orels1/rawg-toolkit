@@ -32,8 +32,8 @@ const getNewNotifs = async notifs => {
 };
 
 const saveShownNotif = async id => {
-  const list = await getFromSync('shownNotifications');
-  await saveToSync('shownNotifications', [].concat(list, [id]));
+  const list = await getFromSync('shownNotifications') || [];
+  await saveToSync('shownNotifications', list.concat([id]));
 };
 
 const checkReleased = async () => {
@@ -61,7 +61,7 @@ const checkReleased = async () => {
     );
     const newNotifs = await getNewNotifs(gameReleases);
 
-    newNotifs.forEach(async game => {
+    for (const game of newNotifs) {
       chrome.notifications.create({
         type: 'list',
         iconUrl: game.games.results[0].background_image,
@@ -74,7 +74,7 @@ const checkReleased = async () => {
       });
       await saveShownNotif(game.id);
       await sleep(15000);
-    });
+    }
   } catch (e) {
     console.error(e);
     return;
