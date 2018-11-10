@@ -32,7 +32,7 @@ const getNewNotifs = async notifs => {
 };
 
 const saveShownNotif = async id => {
-  const list = await getFromSync('shownNotifications') || [];
+  const list = (await getFromSync('shownNotifications')) || [];
   await saveToSync('shownNotifications', list.concat([id]));
 };
 
@@ -91,3 +91,16 @@ chrome.notifications.onButtonClicked.addListener(openNotificationsList);
 
 checkReleased();
 setInterval(checkReleased, 10 * 1000 * 60);
+
+// Navigation trigger
+chrome.webNavigation.onHistoryStateUpdated.addListener(data => {
+  if (data.url.includes('rawg.io')) {
+    const filtered = data.url.substr(data.url.indexOf('rawg.io') + 7);
+    chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
+      chrome.tabs.sendMessage(tabs[0].id, {
+        type: 'locationChange',
+        url: filtered
+      });
+    });
+  }
+});

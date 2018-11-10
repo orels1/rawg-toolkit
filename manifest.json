@@ -29,5 +29,11 @@
       "css": ["styles.css"]
     }
   ],
-  "permissions": ["activeTab", "notifications", "storage", "*://*.rawg.io/"]
+  "permissions": [
+    "activeTab",
+    "notifications",
+    "webNavigation",
+    "storage",
+    "*://*.rawg.io/"
+  ]
 }
