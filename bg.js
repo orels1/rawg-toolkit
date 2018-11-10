@@ -32,8 +32,8 @@ const getNewNotifs = async notifs => {
 };
 
 const saveShownNotif = async id => {
-  const list = await getFromSync('shownNotifications');
-  await saveToSync('shownNotifications', [].concat(list, [id]));
+  const list = await getFromSync('shownNotifications') || [];
+  await saveToSync('shownNotifications', list.concat([id]));
 };
 
 const checkReleased = async () => {
