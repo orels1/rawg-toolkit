@@ -1,0 +1,21 @@
+#rgtk_random {
+  position: absolute;
+  left: 273px;
+  top: 0;
+  z-index: 1;
+  cursor: pointer;
+  font-size: 30px;
+  line-height: 55px;
+  color: hsl(0, 0%, 80%);
+  display: flex;
+}
+
+#rgtk_random:hover .rgtk_random_text {
+  text-decoration: underline;
+}
+
+.rgtk_random_dice {
+  margin-left: 10px;
+  position: relative;
+  top: 4px;
+}
