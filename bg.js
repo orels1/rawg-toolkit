@@ -48,7 +48,8 @@ const checkReleased = async () => {
       'https://api.rawg.io/api/feed/notifications?page_size=40&page=1',
       {
         headers: {
-          token
+          token,
+          'User-Agent': 'RGTK'
         }
       }
     );
