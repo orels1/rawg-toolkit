@@ -31,7 +31,7 @@
         "components/cleanup.js",
         "components/random.js"
       ],
-      "css": ["components/cleanup.css"]
+      "css": ["components/cleanup.css", "components/random.css"]
     }
   ],
   "permissions": [
