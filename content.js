@@ -44,6 +44,11 @@ const mountPoints = {
   random: {
     selector: '.input-search-main',
     urlFilter: url => url === '/'
+  },
+  randomInDb: {
+    selector: '.breadcrumbs',
+    urlFilter: url => url.includes('/games') && !url.includes('@'),
+    method: 'append'
   }
 };
 

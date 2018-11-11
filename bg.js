@@ -105,3 +105,61 @@ chrome.webNavigation.onHistoryStateUpdated.addListener(data => {
     });
   }
 });
+
+const randomList = [];
+let randomResetTimeout = null;
+
+const getIndex = () => {
+  let index = 0;
+  for (let i = 0; i < 1000000; i++) {
+    index = Math.floor(Math.random() * randomList.length);
+    if (index !== 0) {
+      break;
+    }
+  }
+  return index;
+};
+
+// Pseudo-random logic
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (sender.tab.url && message.type === 'getRandomGame') {
+    // clean randomness thing after 10 minutes of inactivity
+    if (randomResetTimeout) {
+      clearTimeout(randomResetTimeout);
+    }
+    randomResetTimeout = setTimeout(() => {
+      randomList.splice(0, randomList.length);
+      randomResetTimeout = null;
+    }, 10 * 1000 * 60);
+
+    // fetch games
+    if (randomList.length === 0) {
+      const resp = fetch('https://api.rawg.io/api/games?limit=1', {
+        headers: {
+          'User-Agent': 'RGTK'
+        }
+      })
+        .then(resp => {
+          if (resp.ok) {
+            return resp.json();
+          }
+        })
+        .then(json => {
+          for (let i = 1; i <= json.count; i++) {
+            randomList.push(i);
+          }
+          const index = getIndex();
+          const gameId = randomList[index];
+          randomList.splice(index, 1);
+          sendResponse({ type: 'randomGame', index: gameId });
+        });
+      return true;
+    } else {
+      // duplicated logic due to chrome messaging quirks
+      const index = getIndex();
+      const gameId = randomList[index];
+      randomList.splice(index, 1);
+      sendResponse({ type: 'randomGame', index: gameId });
+    }
+  }
+});
