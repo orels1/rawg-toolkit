@@ -21,55 +21,80 @@ const createElement = (tag, text = null, attrs = {}, onClick) => {
   return el;
 };
 
-let app = null;
-let insertInterval = null;
+// add fonts
+document.head.append(
+  createElement('link', '', {
+    href: 'https://fonts.googleapis.com/css?family=Press+Start+2P',
+    rel: 'stylesheet'
+  })
+);
 
-const mount = () => {
-  coolLog('Injecting cleanup button');
-  app = new Vue({
-    el: '#rawg-cleanup',
-    template: `
-      <div id="rawg-cleanup">
-        <launch-btn @click="show = true" />
-        <keep-alive>
-          <overlay v-if="show" @close="show = false" />
-        </keep-alive>
-      </div>
-    `,
-    data: () => ({
-      show: false
-    })
-  });
+// global components prefix
+const prefix = 'rgtk';
+// components object
+const components = {};
+// list of mount points for Vue components
+// uses `prepend` by default
+// can supply `method` prop to change that
+const mountPoints = {
+  cleanup: {
+    selector: '.category-container',
+    urlFilter: url => url.includes('@')
+  },
+  random: {
+    selector: '.input-search-main',
+    urlFilter: url => url === '/'
+  }
 };
 
 const insert = () => {
-  const root = document.querySelector('.category-container.available');
-  if (!root) {
-    clearInterval(insertInterval);
-    return;
-  }
+  let failed = false;
+  let retryCount = 0;
+  const interval = setInterval(() => {
+    failed = false;
+    Object.entries(mountPoints).forEach(([component, options]) => {
+      // check if already injected
+      if (!!document.querySelector(`#${prefix}_${component}`)) {
+        return;
+      }
+      // check if on proper page
+      if (!options.urlFilter(window.location.pathname)) {
+        return;
+      }
 
-  const mountPoint = createElement('div', '', { id: 'rawg-cleanup' });
-  root.prepend(mountPoint);
-  document.head.append(
-    createElement('link', '', {
-      href: 'https://fonts.googleapis.com/css?family=Press+Start+2P',
-      rel: 'stylesheet'
-    })
-  );
-  mount();
+      const root = document.querySelector(options.selector);
+      // if for some reason there is no root node - abort and retry
+      if (!root) {
+        failed = true;
+        return;
+      }
+      const mountEl = createElement('div', '', {
+        id: `${prefix}_${component}`
+      });
+      root[options.method || 'prepend'](mountEl);
+      // call the load method
+      components[`${prefix}_load_${component}`]();
+    });
+    if (!failed) {
+      clearInterval(interval);
+    } else {
+      retryCount += 1;
+    }
+
+    // it's dead, Bob ¯\_(ツ)_/¯
+    if (retryCount === 10) {
+      clearInterval(interval);
+    }
+  }, 300);
 };
 
-const checkInsertion = () => {
-  if (!document.querySelector('#rawg-cleanup')) {
+// check that all components were registered
+const registerInterval = setInterval(() => {
+  if (Object.keys(components).length === Object.keys(mountPoints).length) {
     insert();
+    clearInterval(registerInterval);
   }
-};
-
-// if iniitially landed on profile
-if (window.location.pathname.includes('@')) {
-  insertInterval = setInterval(checkInsertion, 1000);
-}
+}, 200);
 
 // grab and sync cookie on first launch
 const grabCookie = () => {
@@ -82,12 +107,12 @@ grabCookie();
 
 chrome.runtime.onMessage.addListener(request => {
   if (request.type === 'locationChange') {
-    if (window.location.pathname.includes('@')) {
-      // from components.js
-      loadComponents();
-      insertInterval = setInterval(checkInsertion, 1000);
-    } else if (insertInterval) {
-      clearInterval(insertInterval);
+    // check if any url rules match
+    const matches = Object.entries(mountPoints).filter(([component, options]) =>
+      options.urlFilter(window.location.pathname)
+    );
+    if (!!matches.length) {
+      insert();
     }
   }
 });

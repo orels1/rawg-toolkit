@@ -25,8 +25,13 @@
   "content_scripts": [
     {
       "matches": ["*://*.rawg.io/*", "*://rawg.io/*"],
-      "js": ["vue.js", "components.js", "content.js"],
-      "css": ["styles.css"]
+      "js": [
+        "vue.js",
+        "content.js",
+        "components/cleanup.js",
+        "components/random.js"
+      ],
+      "css": ["components/cleanup.css"]
     }
   ],
   "permissions": [

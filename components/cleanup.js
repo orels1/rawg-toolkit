@@ -1,15 +1,15 @@
-const loadComponents = () => {
+components[`${prefix}_load_cleanup`] = () => {
   const interval = setInterval(() => {
     if (!Vue) {
       return;
     }
     if (Vue) {
-      coolLog('Registering Vue components');
       Vue.component('launch-btn', {
-        template: `<button class="cleanup_btn" @click="launch">Quick Cleanup! 🚀</button>`,
+        template: `<button class="rgtk_cleanup_btn" @click="launch">Quick Cleanup! 🚀</button>`,
         methods: {
           launch() {
             document.body.setAttribute('style', 'overflow: hidden');
+            window.scrollTo(0, 0);
             this.$emit('click');
           }
         }
@@ -17,11 +17,11 @@ const loadComponents = () => {
 
       Vue.component('overlay', {
         template: `
-          <div class="cleanup_overlay" @click="$refs.catcher.focus()">
-            <div class="cleanup_close" @click="close">ⅹ</div>
+          <div class="rgtk_cleanup_overlay" @click="$refs.catcher.focus()">
+            <div class="rgtk_cleanup_close" @click="close">ⅹ</div>
             <input
               type="text"
-              class="cleanup_catcher"
+              class="rgtk_cleanup_catcher"
               ref="catcher"
               autofocus
               @keydown.p="setStatus('P')"
@@ -41,52 +41,52 @@ const loadComponents = () => {
               @keydown.right="next"
               @keydown.up="comboUp"
             />
-            <div class="cleanup_loading" v-show="loading">
-              <div class="cleanup_row cleanup_loading__counter">
+            <div class="rgtk_cleanup_loading" v-show="loading">
+              <div class="rgtk_cleanup_row rgtk_cleanup_loading__counter">
                 <div>Loading your games...</div>
                 <div>{{this.total - this.loaded}} left</div>
               </div>
-              <div class="cleanup_loading__container">
-                <div class="cleanup_loading__progress" :style="loadingProgressStyle" />
+              <div class="rgtk_cleanup_loading__container">
+                <div class="rgtk_cleanup_loading__progress" :style="loadingProgressStyle" />
               </div>
             </div>
-            <div class="cleanup_item" v-if="games.length > 0 && !loading">
-              <div class="cleanup_item__info">
+            <div class="rgtk_cleanup_item" v-if="games.length > 0 && !loading">
+              <div class="rgtk_cleanup_item__info">
                 <div />
-                <div class="cleanup_item__counter">
+                <div class="rgtk_cleanup_item__counter">
                   {{total - currIndex}} games left
                 </div>
               </div>
-              <div class="cleanup_item__image" :style="{ backgroundImage: 'url(' + games[currIndex].background_image + ')' }">
-                <div class="cleanup_item__arrows">
-                  <div class="cleanup_item__arrow left" @click="prev">&lt;</div>
-                  <div class="cleanup_item__arrow right" @click="next">&gt;</div>
+              <div class="rgtk_cleanup_item__image" :style="{ backgroundImage: 'url(' + games[currIndex].background_image + ')' }">
+                <div class="rgtk_cleanup_item__arrows">
+                  <div class="rgtk_cleanup_item__arrow left" @click="prev">&lt;</div>
+                  <div class="rgtk_cleanup_item__arrow right" @click="next">&gt;</div>
                 </div>
-                <div class="cleanup_loading__container cleanup_combo__bar" v-show="combo > 0">
-                  <div :class="['cleanup_loading__progress', comboBarClass]" />
+                <div class="rgtk_cleanup_loading__container rgtk_cleanup_combo__bar" v-show="combo > 0">
+                  <div :class="['rgtk_cleanup_loading__progress', comboBarClass]" />
                 </div>
               </div>
-              <img v-if="currIndex < total -1" class="cleanup_prefetch" :src="games[currIndex + 1].background_image" />
-              <div class="cleanup_item__info">
-                <h4 class="cleanup_item__title">{{games[currIndex].name}}</h4>
-                <div class="cleanup_item__actions">
+              <img v-if="currIndex < total -1" class="rgtk_cleanup_prefetch" :src="games[currIndex + 1].background_image" />
+              <div class="rgtk_cleanup_item__info">
+                <h4 class="rgtk_cleanup_item__title">{{games[currIndex].name}}</h4>
+                <div class="rgtk_cleanup_item__actions">
                   <div
                     v-for="action in ['P', 'C', 'A', 'Y']"
                     :key="action"
                     @click="setStatus(action)"
-                    :class="['cleanup_item__action', games[currIndex].status === statusMap[action] ? 'active' : '' ]"
+                    :class="['rgtk_cleanup_item__action', games[currIndex].status === statusMap[action] ? 'active' : '' ]"
                   >
                     {{action}}
                   </div>
-                  <div v-show="combo > 0" class="cleanup_item__combo">
+                  <div v-show="combo > 0" class="rgtk_cleanup_item__combo">
                     <i>x</i>
-                    <b :class="['cleanup_item__combo_hax', comboClass]">{{combo}}</b>
-                    <b class="cleanup_hidden">{{combo}}</b>
-                    <b :class="['cleanup_item__combo_shadow', comboClass]">{{combo}}</b>
+                    <b :class="['rgtk_cleanup_item__combo_hax', comboClass]">{{combo}}</b>
+                    <b class="rgtk_cleanup_hidden">{{combo}}</b>
+                    <b :class="['rgtk_cleanup_item__combo_shadow', comboClass]">{{combo}}</b>
                   </div>
                 </div>
               </div>
-              <div class="cleanup_item__help">
+              <div class="rgtk_cleanup_item__help">
                 Keyboard shortcuts: 🤓
                 <br />
                 Use <b>P, C, A, Y</b> to assign the statuses <b>Playing, Completed, Abandoned, Yet To Play</b> respectively.
@@ -94,7 +94,7 @@ const loadComponents = () => {
                 Use arrow keys to navigate.
                 <br />
                 You can also use <b>1, 2, 3, 4</b> or <b>H, J, K, L</b> to assign statues (same order as the above).
-                <hr class="cleanup_separator" />
+                <hr class="rgtk_cleanup_separator" />
                 Use <b>Z</b> to toggle combo mode.
                 <br />
                 <b>Combo Mode is {{comboActive ? 'on! 👊' : 'off'}}</b>
@@ -154,7 +154,7 @@ const loadComponents = () => {
             if (!this.comboActive) return;
             this.clearTimeouts();
             this.combo += 1;
-            this.comboClass = 'cleanup_boom';
+            this.comboClass = 'rgtk_cleanup_boom';
             this.comboBarClass = '';
             this.comboBarTimeout = setTimeout(() => {
               this.comboBarClass = 'decay';
@@ -241,12 +241,23 @@ const loadComponents = () => {
         }
       });
 
+      coolLog('Injecting CLEANUP components');
+      new Vue({
+        el: `#${prefix}_cleanup`,
+        template: `
+          <div id="${prefix}_cleanup">
+            <launch-btn @click="show = true" />
+            <keep-alive>
+              <overlay v-if="show" @close="show = false" />
+            </keep-alive>
+          </div>
+        `,
+        data: () => ({
+          show: false
+        })
+      });
+
       clearInterval(interval);
     }
   }, 200);
 };
-
-// if iniitially landed on profile
-if (window.location.pathname.includes('@')) {
-  loadComponents();
-}
