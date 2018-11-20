@@ -155,6 +155,9 @@ components[`${prefix}_load_cleanup`] = () => {
           comboUp() {
             if (!this.comboActive) return;
             this.clearTimeouts();
+            if (this.currIndex === this.total - 1) {
+              return;
+            }
             this.combo += 1;
             this.comboClass = `${lprefix}_boom`;
             this.comboBarClass = '';
