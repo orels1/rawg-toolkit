@@ -6,7 +6,7 @@ components[`${prefix}_load_cleanup`] = () => {
       return;
     }
     if (Vue) {
-      Vue.component('launch-btn', {
+      Vue.component(`${lprefix}-launch-btn`, {
         template: `<button class="${lprefix}_btn" @click="launch">Quick Cleanup! 🚀</button>`,
         methods: {
           launch() {
@@ -17,7 +17,7 @@ components[`${prefix}_load_cleanup`] = () => {
         }
       });
 
-      Vue.component('overlay', {
+      Vue.component(`${lprefix}-overlay`, {
         template: `
           <div class="${lprefix}_overlay" @click="$refs.catcher.focus()">
             <div class="${lprefix}_close" @click="close">ⅹ</div>
@@ -251,9 +251,9 @@ components[`${prefix}_load_cleanup`] = () => {
         el: `#${lprefix}`,
         template: `
           <div id="${lprefix}">
-            <launch-btn @click="show = true" />
+            <${lprefix}-launch-btn @click="show = true" />
             <keep-alive>
-              <overlay v-if="show" @close="show = false" />
+              <${lprefix}-overlay v-if="show" @close="show = false" />
             </keep-alive>
           </div>
         `,

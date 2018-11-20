@@ -29,9 +29,14 @@
         "vue.js",
         "content.js",
         "components/cleanup.js",
-        "components/random.js"
+        "components/random.js",
+        "components/options.js"
       ],
-      "css": ["components/cleanup.css", "components/random.css"]
+      "css": [
+        "components/cleanup.css",
+        "components/random.css",
+        "components/options.css"
+      ]
     }
   ],
   "permissions": [

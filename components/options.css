@@ -1,0 +1,57 @@
+.rgtk_options_overlay {
+  width: 100vw;
+  height: 100vh;
+  z-index: 1000;
+  top: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  justify-content: center;
+  align-items: center;
+  background-color: hsla(0, 0%, 0%, 0.9);
+}
+
+.rgtk_options_close {
+  position: absolute;
+  left: 15px;
+  top: 0;
+  font-size: 40px;
+  transform: scaleX(1.2);
+  font-weight: 100;
+  color: hsla(0, 0%, 100%, 0.3);
+  cursor: pointer;
+  transition: color 300ms ease;
+}
+
+.rgtk_options_close:hover {
+  color: hsla(0, 0%, 100%, 1);
+}
+
+.rgtk_options_container {
+  width: 40%;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  background-color: hsl(0, 0%, 10%);
+  color: hsl(0, 0%, 40%);
+  font-size: 14px;
+  border-radius: 4px;
+}
+
+.rgtk_options_item {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  transition: color 300ms;
+  color: hsla(0, 0%, 100%, 0.5);
+  margin-bottom: 10px;
+}
+
+.rgtk_options_item:last-of-type {
+  margin-bottom: 0;
+}
+
+.rgtk_options_item.active {
+  color: hsla(0, 0%, 100%, 1);
+}

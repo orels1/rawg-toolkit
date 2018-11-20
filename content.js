@@ -49,6 +49,17 @@ const mountPoints = {
     selector: '.breadcrumbs',
     urlFilter: url => url.includes('/games') && !url.includes('@'),
     method: 'append'
+  },
+  options: {
+    selector: '.header-menu-dropdown-container ul',
+    urlFilter: () => true,
+    method: 'append'
+  },
+  options_overlay: {
+    pure: true,
+    selector: 'body',
+    urlFilter: () => true,
+    method: 'append'
   }
 };
 
@@ -77,6 +88,10 @@ const insert = () => {
         id: `${prefix}_${component}`
       });
       root[options.method || 'prepend'](mountEl);
+      // pure components just add mount points for misc use
+      if (options.pure) {
+        return;
+      }
       // call the load method
       components[`${prefix}_load_${component}`]();
     });
@@ -95,7 +110,10 @@ const insert = () => {
 
 // check that all components were registered
 const registerInterval = setInterval(() => {
-  if (Object.keys(components).length === Object.keys(mountPoints).length) {
+  if (
+    Object.keys(components).length ===
+    Object.keys(mountPoints).filter(k => !mountPoints[k].pure).length
+  ) {
     insert();
     clearInterval(registerInterval);
   }
