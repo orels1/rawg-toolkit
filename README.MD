@@ -15,7 +15,7 @@
 
 ## Usage
 
-Install from [Chrome Web Store](https://chrome.google.com/webstore/detail/rawg-library-cleaner/hhjibfjhfjoledimkkafjammfkoekhmi) and enjoy!
+Install from [Chrome Web Store](https://chrome.google.com/webstore/detail/rawg-library-cleaner/hhjibfjhfjoledimkkafjammfkoekhmi) and enjoy! Yay!
 
 ## Motivation
 
