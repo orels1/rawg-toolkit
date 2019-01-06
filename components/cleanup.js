@@ -6,7 +6,7 @@ components[`${prefix}_load_cleanup`] = () => {
       return;
     }
     if (Vue) {
-      Vue.component('launch-btn', {
+      Vue.component(`${lprefix}-launch-btn`, {
         template: `<button class="${lprefix}_btn" @click="launch">Quick Cleanup! 🚀</button>`,
         methods: {
           launch() {
@@ -17,7 +17,7 @@ components[`${prefix}_load_cleanup`] = () => {
         }
       });
 
-      Vue.component('overlay', {
+      Vue.component(`${lprefix}-overlay`, {
         template: `
           <div class="${lprefix}_overlay" @click="$refs.catcher.focus()">
             <div class="${lprefix}_close" @click="close">ⅹ</div>
@@ -38,7 +38,6 @@ components[`${prefix}_load_cleanup`] = () => {
               @keydown.j="setStatus('C')"
               @keydown.k="setStatus('A')"
               @keydown.l="setStatus('Y')"
-              @keydown.z="comboActive = !comboActive"
               @keydown.left="prev"
               @keydown.right="next"
               @keydown.up="comboUp"
@@ -97,7 +96,7 @@ components[`${prefix}_load_cleanup`] = () => {
                 <br />
                 You can also use <b>1, 2, 3, 4</b> or <b>H, J, K, L</b> to assign statues (same order as the above).
                 <hr class="${lprefix}_separator" />
-                Use <b>Z</b> to toggle combo mode.
+                You can toggle combo mode in the extension settings.
                 <br />
                 <b>Combo Mode is {{comboActive ? 'on! 👊' : 'off'}}</b>
               </div>
@@ -155,6 +154,9 @@ components[`${prefix}_load_cleanup`] = () => {
           comboUp() {
             if (!this.comboActive) return;
             this.clearTimeouts();
+            if (this.currIndex === this.total - 1) {
+              return;
+            }
             this.combo += 1;
             this.comboClass = `${lprefix}_boom`;
             this.comboBarClass = '';
@@ -223,7 +225,13 @@ components[`${prefix}_load_cleanup`] = () => {
             this.token = tokenStart.substr(6, tokenStart.indexOf(';') - 6);
           }
         },
+        async activated() {
+          await loadSettings();
+          this.comboActive = settings.combo;
+        },
         async mounted() {
+          await loadSettings();
+          this.comboActive = settings.combo;
           this.loadToken();
           if (!this.games.length) {
             await this.loadTotal();
@@ -248,9 +256,9 @@ components[`${prefix}_load_cleanup`] = () => {
         el: `#${lprefix}`,
         template: `
           <div id="${lprefix}">
-            <launch-btn @click="show = true" />
+            <${lprefix}-launch-btn @click="show = true" />
             <keep-alive>
-              <overlay v-if="show" @close="show = false" />
+              <${lprefix}-overlay v-if="show" @close="show = false" />
             </keep-alive>
           </div>
         `,
