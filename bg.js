@@ -37,6 +37,10 @@ const saveShownNotif = async id => {
 };
 
 const checkReleased = async () => {
+  const settings = (await getFromSync('settings')) || {};
+  if (!settings.releaseNotify) {
+    return;
+  }
   try {
     const token = await getFromSync('token');
     if (!token) {
@@ -122,44 +126,61 @@ const getIndex = () => {
 
 // Pseudo-random logic
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (sender.tab.url && message.type === 'getRandomGame') {
-    // clean randomness thing after 10 minutes of inactivity
-    if (randomResetTimeout) {
-      clearTimeout(randomResetTimeout);
-    }
-    randomResetTimeout = setTimeout(() => {
-      randomList.splice(0, randomList.length);
-      randomResetTimeout = null;
-    }, 10 * 1000 * 60);
+  if (!sender.tab.url) {
+    return;
+  }
+  switch (message.type) {
+    case 'getRandomGame':
+      // clean randomness thing after 10 minutes of inactivity
+      if (randomResetTimeout) {
+        clearTimeout(randomResetTimeout);
+      }
+      randomResetTimeout = setTimeout(() => {
+        randomList.splice(0, randomList.length);
+        randomResetTimeout = null;
+      }, 10 * 1000 * 60);
 
-    // fetch games
-    if (randomList.length === 0) {
-      const resp = fetch('https://api.rawg.io/api/games?limit=1', {
-        headers: {
-          'User-Agent': 'RGTK'
-        }
-      })
-        .then(resp => {
-          if (resp.ok) {
-            return resp.json();
+      // fetch games
+      if (randomList.length === 0) {
+        const resp = fetch('https://api.rawg.io/api/games?limit=1', {
+          headers: {
+            'User-Agent': 'RGTK'
           }
         })
-        .then(json => {
-          for (let i = 1; i <= json.count; i++) {
-            randomList.push(i);
-          }
-          const index = getIndex();
-          const gameId = randomList[index];
-          randomList.splice(index, 1);
-          sendResponse({ type: 'randomGame', index: gameId });
-        });
+          .then(resp => {
+            if (resp.ok) {
+              return resp.json();
+            }
+          })
+          .then(json => {
+            for (let i = 1; i <= json.count; i++) {
+              randomList.push(i);
+            }
+            const index = getIndex();
+            const gameId = randomList[index];
+            randomList.splice(index, 1);
+            sendResponse({ type: 'randomGame', index: gameId });
+          });
+        return true;
+      } else {
+        // duplicated logic due to chrome messaging quirks
+        const index = getIndex();
+        const gameId = randomList[index];
+        randomList.splice(index, 1);
+        sendResponse({ type: 'randomGame', index: gameId });
+      }
+      break;
+    case 'getSettings':
+      getFromSync('settings').then(settings => {
+        sendResponse({ type: 'settings', settings });
+      });
       return true;
-    } else {
-      // duplicated logic due to chrome messaging quirks
-      const index = getIndex();
-      const gameId = randomList[index];
-      randomList.splice(index, 1);
-      sendResponse({ type: 'randomGame', index: gameId });
-    }
+    case 'setSettings':
+      saveToSync('settings', message.data).then(settings => {
+        sendResponse({ type: 'settings', settings });
+      });
+      return true;
+    default:
+      return;
   }
 });

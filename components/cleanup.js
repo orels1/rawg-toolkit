@@ -38,7 +38,6 @@ components[`${prefix}_load_cleanup`] = () => {
               @keydown.j="setStatus('C')"
               @keydown.k="setStatus('A')"
               @keydown.l="setStatus('Y')"
-              @keydown.z="comboActive = !comboActive"
               @keydown.left="prev"
               @keydown.right="next"
               @keydown.up="comboUp"
@@ -97,7 +96,7 @@ components[`${prefix}_load_cleanup`] = () => {
                 <br />
                 You can also use <b>1, 2, 3, 4</b> or <b>H, J, K, L</b> to assign statues (same order as the above).
                 <hr class="${lprefix}_separator" />
-                Use <b>Z</b> to toggle combo mode.
+                You can toggle combo mode in the extension settings.
                 <br />
                 <b>Combo Mode is {{comboActive ? 'on! 👊' : 'off'}}</b>
               </div>
@@ -226,7 +225,13 @@ components[`${prefix}_load_cleanup`] = () => {
             this.token = tokenStart.substr(6, tokenStart.indexOf(';') - 6);
           }
         },
+        async activated() {
+          await loadSettings();
+          this.comboActive = settings.combo;
+        },
         async mounted() {
+          await loadSettings();
+          this.comboActive = settings.combo;
           this.loadToken();
           if (!this.games.length) {
             await this.loadTotal();

@@ -29,6 +29,8 @@ document.head.append(
   })
 );
 
+let settings = {};
+
 // global components prefix
 const prefix = 'rgtk';
 // components object
@@ -43,7 +45,8 @@ const mountPoints = {
   },
   random: {
     selector: '.input-search-main',
-    urlFilter: url => url === '/'
+    urlFilter: url => url === '/',
+    setting: 'randomGames'
   },
   randomInDb: {
     selector: '.breadcrumbs',
@@ -51,17 +54,87 @@ const mountPoints = {
     method: 'append'
   },
   options: {
-    selector: '.header-menu-dropdown-container ul',
+    selector: '.header-menu__content-area',
     urlFilter: () => true,
-    method: 'append'
+    method: 'append',
+    watch: true,
+    watchSelector: '#portals'
   },
   options_overlay: {
     pure: true,
     selector: 'body',
     urlFilter: () => true,
-    method: 'append'
+    method: 'append',
+    watch: true,
+    watchSelector: '#portals'
   }
 };
+
+const watched = [];
+
+const watch = (component, options) => {
+  if (options.watch && !watched.includes(component)) {
+    watched.push(component);
+    return true;
+  } else {
+    return false;
+  }
+};
+
+const insertSingle = ({ component, options }) => {
+  // check if module is disabled
+  if (options.setting && !settings[options.setting]) {
+    return;
+  }
+  // check if already injected
+  if (!!document.querySelector(`#${prefix}_${component}`)) {
+    return;
+  }
+  // check if on proper page
+  if (!options.urlFilter(window.location.pathname)) {
+    return;
+  }
+  const root = document.querySelector(options.selector);
+  // if for some reason there is no root node - abort and retry
+  if (!root) {
+    // add to watchlist before exiting
+    if (watch(component, options)) {
+      return true;
+    }
+    return false;
+  }
+
+  // add to watchlist even if the root is there
+  watch(component, options);
+  const mountEl = createElement('div', '', {
+    id: `${prefix}_${component}`
+  });
+  root[options.method || 'prepend'](mountEl);
+  // pure components just add mount points for misc use
+  if (options.pure) {
+    return true;
+  }
+  // call the load method
+  components[`${prefix}_load_${component}`]();
+  return true;
+};
+
+// watches if the watched selector was triggered and inserts
+const mutationObserver = new MutationObserver(mutations => {
+  mutations.forEach(mutation => {
+    watched.forEach(component => {
+      if (
+        (mutation.target.className ===
+          mountPoints[component].watchSelector.substr(1) ||
+          mutation.target.id ===
+            mountPoints[component].watchSelector.substr(1)) &&
+        mutation.addedNodes.length
+      ) {
+        insertSingle({ component, options: mountPoints[component] });
+      }
+    });
+  });
+});
 
 const insert = () => {
   let failed = false;
@@ -69,34 +142,20 @@ const insert = () => {
   const interval = setInterval(() => {
     failed = false;
     Object.entries(mountPoints).forEach(([component, options]) => {
-      // check if already injected
-      if (!!document.querySelector(`#${prefix}_${component}`)) {
-        return;
-      }
-      // check if on proper page
-      if (!options.urlFilter(window.location.pathname)) {
-        return;
-      }
-
-      const root = document.querySelector(options.selector);
-      // if for some reason there is no root node - abort and retry
-      if (!root) {
-        failed = true;
-        return;
-      }
-      const mountEl = createElement('div', '', {
-        id: `${prefix}_${component}`
-      });
-      root[options.method || 'prepend'](mountEl);
-      // pure components just add mount points for misc use
-      if (options.pure) {
-        return;
-      }
-      // call the load method
-      components[`${prefix}_load_${component}`]();
+      failed = !insertSingle({ component, options });
     });
     if (!failed) {
       clearInterval(interval);
+      // inserting watchers after everything else was mounted
+      watched.forEach(name => {
+        mutationObserver.observe(
+          document.querySelector(mountPoints[name].watchSelector),
+          {
+            childList: true,
+            subtree: true
+          }
+        );
+      });
     } else {
       retryCount += 1;
     }
@@ -108,16 +167,36 @@ const insert = () => {
   }, 300);
 };
 
-// check that all components were registered
-const registerInterval = setInterval(() => {
-  if (
-    Object.keys(components).length ===
-    Object.keys(mountPoints).filter(k => !mountPoints[k].pure).length
-  ) {
-    insert();
-    clearInterval(registerInterval);
+// load settings global method
+const loadSettings = () =>
+  new Promise(resolve => {
+    chrome.runtime.sendMessage(
+      { type: 'getSettings' },
+      ({ settings: loadedSettings }) => {
+        settings = loadedSettings || {};
+        resolve(settings);
+      }
+    );
+  });
+
+// load settings before mounting anything
+chrome.runtime.sendMessage(
+  { type: 'getSettings' },
+  ({ settings: loadedSettings }) => {
+    settings = loadedSettings || {};
+
+    // check that all components were registered
+    const registerInterval = setInterval(() => {
+      if (
+        Object.keys(components).length ===
+        Object.keys(mountPoints).filter(k => !mountPoints[k].pure).length
+      ) {
+        insert();
+        clearInterval(registerInterval);
+      }
+    }, 200);
   }
-}, 200);
+);
 
 // grab and sync cookie on first launch
 const grabCookie = () => {

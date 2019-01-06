@@ -12,7 +12,7 @@ components[`${prefix}_load_options`] = () => {
       coolLog('Injecting OPTIONS components');
       new Vue({
         el: `#${lprefix}`,
-        template: `<li><div class="header-menu-content__settings-link" @click="launch">Toolkit Options</div></li>`,
+        template: `<a class="header-menu-content__settings-link" @click="launch">Toolkit Options</a>`,
         methods: {
           launch() {
             eventBus.$emit('launch');
@@ -30,7 +30,7 @@ components[`${prefix}_load_options`] = () => {
                 v-for="option in options"
                 :key="option.key"
                 :class="['${lprefix}_item', option.enabled && 'active']"
-                @click="option.enabled = !option.enabled"
+                @click="toggleOption(option)"
               >
                 <div class="checkbox__input">
                   <span class="SVGInline" v-show="option.enabled">
@@ -73,10 +73,27 @@ components[`${prefix}_load_options`] = () => {
           close() {
             this.shown = false;
             document.body.setAttribute('style', 'overflow: visible');
+          },
+          toggleOption(option) {
+            settings[option.key] = !option.enabled;
+            chrome.runtime.sendMessage(
+              { type: 'setSettings', data: settings },
+              response => {
+                loadSettings().then(settings => {
+                  this.syncSettings();
+                });
+              }
+            );
+          },
+          syncSettings() {
+            this.options.forEach((option, index) => {
+              this.options[index].enabled = settings[option.key];
+            });
           }
         },
         mounted() {
           eventBus.$on('launch', this.launch);
+          this.syncSettings();
         }
       });
 
