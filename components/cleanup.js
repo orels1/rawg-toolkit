@@ -20,7 +20,7 @@ components[`${prefix}_load_cleanup`] = () => {
       Vue.component(`${lprefix}-overlay`, {
         template: `
           <div class="${lprefix}_overlay" @click="$refs.catcher.focus()">
-            <div class="${lprefix}_close" @click="close">ⅹ</div>
+            <div class="${lprefix}_close" @click="close">×</div>
             <input
               type="text"
               class="${lprefix}_catcher"

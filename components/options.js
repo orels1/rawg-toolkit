@@ -24,7 +24,7 @@ components[`${prefix}_load_options`] = () => {
         el: `#${lprefix}_overlay`,
         template: `
           <div class="${lprefix}_overlay" v-if="shown">
-            <div class="${lprefix}_close" @click="close">ⅹ</div>
+            <div class="${lprefix}_close" @click="close">×</div>
             <div class="${lprefix}_container">
               <div
                 v-for="option in options"
