@@ -41,7 +41,8 @@ const components = {};
 const mountPoints = {
   cleanup: {
     selector: '.category-container',
-    urlFilter: url => url.includes('@')
+    urlFilter: url => url.includes('@'),
+    setting: 'cleanup'
   },
   random: {
     selector: '.input-search-main',

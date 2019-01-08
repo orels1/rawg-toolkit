@@ -114,6 +114,7 @@ const randomList = [];
 let randomResetTimeout = null;
 
 const getIndex = () => {
+const getIndex = (list) => {
   let index = 0;
   for (let i = 0; i < 1000000; i++) {
     index = Math.floor(Math.random() * randomList.length);
@@ -123,6 +124,13 @@ const getIndex = () => {
   }
   return index;
 };
+
+const defaultSettings = {
+  randomGames: true,
+  releaseNotify: true,
+  cleanup: true,
+  combo: true,
+}
 
 // Pseudo-random logic
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
@@ -172,7 +180,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       break;
     case 'getSettings':
       getFromSync('settings').then(settings => {
-        sendResponse({ type: 'settings', settings });
+        const filledSettings = settings ? settings : defaultSettings;
+        sendResponse({ type: 'settings', settings: filledSettings });
       });
       return true;
     case 'setSettings':

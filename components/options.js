@@ -1,5 +1,5 @@
 components[`${prefix}_load_options`] = () => {
-  const name = 'options';
+  const name = "options";
   const lprefix = `${prefix}_${name}`;
 
   const interval = setInterval(() => {
@@ -9,13 +9,13 @@ components[`${prefix}_load_options`] = () => {
     if (Vue) {
       const eventBus = new Vue();
 
-      coolLog('Injecting OPTIONS components');
+      coolLog("Injecting OPTIONS components");
       new Vue({
         el: `#${lprefix}`,
         template: `<a class="header-menu-content__settings-link" @click="launch">Toolkit Options</a>`,
         methods: {
           launch() {
-            eventBus.$emit('launch');
+            eventBus.$emit("launch");
           }
         }
       });
@@ -27,19 +27,26 @@ components[`${prefix}_load_options`] = () => {
             <div class="${lprefix}_close" @click="close">×</div>
             <div class="${lprefix}_container">
               <div
-                v-for="option in options"
-                :key="option.key"
-                :class="['${lprefix}_item', option.enabled && 'active']"
-                @click="toggleOption(option)"
+                v-for="(section, sectionIndex) in options"
+                :key="section.label"
+                class="${lprefix}_section"
               >
-                <div class="checkbox__input">
-                  <span class="SVGInline" v-show="option.enabled">
-                    <svg class="SVGInline-svg" width="18" height="13" viewBox="0 0 18 13" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M1 6.238l4.97 4.97M16.714 1L6.225 11.49" stroke-width="2" stroke="#13C948" fill="none" stroke-linecap="round" />
-                    </svg>
-                  </span>
+                <div class="${lprefix}_label">{{section.label}}</div>
+                <div
+                  v-for="option in section.list"
+                  :key="option.label"
+                  :class="['${lprefix}_item', option.enabled && 'active']"
+                  @click="toggleOption(sectionIndex, option)"
+                >
+                  <div class="checkbox__input">
+                    <span class="SVGInline" v-show="option.enabled">
+                      <svg class="SVGInline-svg" width="18" height="13" viewBox="0 0 18 13" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M1 6.238l4.97 4.97M16.714 1L6.225 11.49" stroke-width="2" stroke="#13C948" fill="none" stroke-linecap="round" />
+                      </svg>
+                    </span>
+                  </div>
+                  {{option.label}}
                 </div>
-                {{option.label}}
               </div>
             </div>
           </div>
@@ -48,19 +55,34 @@ components[`${prefix}_load_options`] = () => {
           shown: false,
           options: [
             {
-              label: 'Enable combo-mode',
-              key: 'combo',
-              enabled: false
+              label: "Modules",
+              list: [
+                {
+                  label: "Game release notifications",
+                  key: "releaseNotify",
+                  enabled: false
+                },
+                {
+                  label: "Random game buttons",
+                  key: "randomGames",
+                  enabled: false
+                },
+                {
+                  label: "Library cleanup",
+                  key: "cleanup",
+                  enabled: false
+                }
+              ]
             },
             {
-              label: 'Enable release notifications',
-              key: 'releaseNotify',
-              enabled: false
-            },
-            {
-              label: 'Enable random games',
-              key: 'randomGames',
-              enabled: false
+              label: 'Options',
+              list: [
+                {
+                  label: 'Combo-mode in library cleanup',
+                  key: 'combo',
+                  enabled: false
+                },
+              ]
             }
           ]
         }),
@@ -74,7 +96,7 @@ components[`${prefix}_load_options`] = () => {
             this.shown = false;
             document.body.setAttribute('style', 'overflow: visible');
           },
-          toggleOption(option) {
+          toggleOption(sectionIndex, option) {
             settings[option.key] = !option.enabled;
             chrome.runtime.sendMessage(
               { type: 'setSettings', data: settings },
@@ -86,8 +108,10 @@ components[`${prefix}_load_options`] = () => {
             );
           },
           syncSettings() {
-            this.options.forEach((option, index) => {
-              this.options[index].enabled = settings[option.key];
+            this.options.forEach((section, sectionIndex) => {
+              section.list.forEach((option, index) => {
+                this.options[sectionIndex].list[index].enabled = settings[option.key];
+              });
             });
           }
         },

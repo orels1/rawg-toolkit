@@ -38,6 +38,20 @@
   border-radius: 4px;
 }
 
+.rgtk_options_section {
+  margin-bottom: 20px;
+}
+
+.rgtk_options_label {
+  font-size: 20px;
+  font-weight: bold;
+  color: hsl(0, 0%, 70%);
+  width: 100%;
+  border-bottom: .3px solid rgba(255,255,255, .3);
+  padding-bottom: 7px;
+  margin-bottom: 10px;
+}
+
 .rgtk_options_item {
   cursor: pointer;
   display: flex;
