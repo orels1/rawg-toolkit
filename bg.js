@@ -114,7 +114,6 @@ const randomList = [];
 let randomResetTimeout = null;
 
 const getIndex = () => {
-const getIndex = (list) => {
   let index = 0;
   for (let i = 0; i < 1000000; i++) {
     index = Math.floor(Math.random() * randomList.length);
