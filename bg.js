@@ -124,6 +124,13 @@ const getIndex = () => {
   return index;
 };
 
+const defaultSettings = {
+  randomGames: true,
+  releaseNotify: true,
+  cleanup: true,
+  combo: true,
+}
+
 // Pseudo-random logic
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (!sender.tab.url) {
@@ -172,7 +179,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       break;
     case 'getSettings':
       getFromSync('settings').then(settings => {
-        sendResponse({ type: 'settings', settings });
+        const filledSettings = settings ? settings : defaultSettings;
+        sendResponse({ type: 'settings', settings: filledSettings });
       });
       return true;
     case 'setSettings':
