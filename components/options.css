@@ -31,7 +31,7 @@
   width: 40%;
   display: flex;
   flex-direction: column;
-  padding: 20px;
+  padding: 15px 20px 20px 20px;
   background-color: hsl(0, 0%, 10%);
   color: hsl(0, 0%, 40%);
   font-size: 14px;
@@ -42,13 +42,16 @@
   margin-bottom: 20px;
 }
 
+.rgtk_options_section:last-of-type {
+  margin-bottom: 0;
+}
+
 .rgtk_options_label {
   font-size: 20px;
-  font-weight: bold;
-  color: hsl(0, 0%, 70%);
+  color: hsl(0, 0%, 80%);
   width: 100%;
   border-bottom: .3px solid rgba(255,255,255, .3);
-  padding-bottom: 7px;
+  padding-bottom: 10px;
   margin-bottom: 10px;
 }
 
