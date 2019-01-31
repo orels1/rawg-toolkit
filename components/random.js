@@ -13,7 +13,6 @@ components[`${prefix}_load_random`] = () => {
         template: `
           <div id="${lprefix}" @click="loadRandom">
             <div class="${lprefix}_text">...or pick a random one</div>
-            <div class="${lprefix}_dice">🎲</div>
           </div>
         `,
         methods: {
